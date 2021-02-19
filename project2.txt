@@ -1,0 +1,48 @@
+# Посчитать среднее значение с помощью оператора pivot_table
+name_stat =data.pivot_table(index='name', values='time_spent') 
+print(name_stat)
+
+# распределение числа заездов по сетям
+print(data['name'].value_counts().sort_values(ascending=False).head(10))
+
+# построение гистограммы по столбцу разбитых на 100 столбцов с диапазоном значение от 0 до 1500
+data['time_spent'].hist(bins = 100, range = (0, 1500))
+
+# построение диаграммы размаха
+data.boxplot()
+plt.ylim(-100, 1000)
+
+# методом describe() получим характерные значения таблицы data:
+print(data.describe())
+
+# Выберем дешёвые авиабилеты — те у которых цена меньше максимальной в полтора раза или ещё ниже:
+print(df[1.5 *df['Price'] <= df['Price'].max()])
+
+#Выберем строки, где значения столбца 'Travel_time_from' больше или равно 365, или значения 'Travel_time_to' меньше 250. Результат выведите на экран:
+print(df[(df['Travel_time_from'] >= 365) | (df['Travel_time_to'] < 250)])
+
+# Выберите строки, где: Полёт с пересадкой; Возвращение до 8 июля (ни 9, ни 10, ни 11 июля).
+print(df[(df['Is_Direct'] == False) & (~df['Date_To'].isin(('09.07.2019', '10.07.2019', '11.07.2019')))]) 
+
+# Выберите строки, где: Has_luggage равно False и Airline не равно ни S7, ни Rossiya. 
+print(df.query('Has_luggage == False and Airline not in ("S7", "Rossiya")'))
+
+#Выберите строки, где Airline равно "Belavia", "S7" или "Rossiya", при этом 'Travel_time_from' меньше переменной под названием max_time.
+print(df.query('Airline == ("Belavia", "S7","Rossiya") and Travel_time_from < @max_time'))
+
+#На каких АЗС водители проводят больше всего времени.
+print(data.sort_values(by = ['time_spent'], ascending = False).head(10))
+
+#построение гистрограмм на разных графиках
+sample = data.query('id == "3c1e4c52"')
+data.hist(column = 'time_spent', bins = 100, range = (0, 1500))
+plt.show()
+sample.hist(column = 'time_spent', bins = 100, range = (0, 1500))
+plt.show()
+
+#перевод значения в столбце в формат даты и измение времени со сдвигом на 3 часа B округление 
+data['date_time'] = pd.to_datetime(data['date_time'], format = '%Y-%m-%dT%H:%M:%S')
+data['local_time'] = data['date_time'] + pd.Timedelta(hours=3)
+data['date_hour'] = data['local_time'].dt.round('1H')
+print(data.head())
+
