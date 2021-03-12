@@ -1,0 +1,34 @@
+data_part1 = data_users.merge(id_calls, on=['user_id'], how='outer')
+
+data_part1.head()
+
+
+data_part2 = data_part1.merge(id_message, on='user_id', how='outer')
+
+data_part2.head()
+
+data_part3 = data_part2.merge(id_internet, on='user_id', how='outer')
+
+data_part3.head()
+
+# переименовываем столбец "tariff_name" в датафрейме data_tariffs, для дальнейшего объедиенния таблиц
+
+data_tariffs = data_tariffs.rename(columns = {"tariff_name":"tariff"})
+
+
+# объединяем табицу data_part3 и data_tariffs
+
+data = data_part3.merge(data_tariffs, on='tariff', how='outer')
+
+#data = data.sort_values('user_id')
+
+data.head()
+
+
+# проверяем датафрейм на наличие пропущенных значений
+
+data.isna().sum()
+
+# Создадим новый датафрейм содержащий в себе информацию по поводу тарифа и id пользователя 
+
+id_1 = data_users[['user_id', 'tariff']] 
