@@ -32,3 +32,66 @@ data.isna().sum()
 # Создадим новый датафрейм содержащий в себе информацию по поводу тарифа и id пользователя 
 
 id_1 = data_users[['user_id', 'tariff']] 
+
+# Функция для подсчета стоимости тарифа в месяц по пользователям
+
+def megaline_income(row):
+    call_duration = row['call_duration']
+    message_count = row['message_count']
+    internet_used = row['mb_used']
+    tariff = row['tariff']
+ 
+    # рассчитаем доходность тарифа "Смарт"
+    if tariff == 'smart':
+        # стоимость звонков сверх тарифа
+        call_duration_add = (call_duration - tariffs.loc[0, 'minutes_included'])\
+        *tariffs.loc[0, 'rub_per_minute']
+ 
+        # стоимость смс сверх тарифа
+        message_count_add = (message_count - tariffs.loc[0, 'messages_included'])\
+        *tariffs.loc[0, 'rub_per_message']
+ 
+        # стоимость интернета сверх тарифа
+        internet_add = (internet_used - tariffs.loc[0, 'mb_per_month_included'])\
+        *tariffs.loc[0, 'rub_per_gb']/1024
+ 
+        # когда израсходованных услуг меньше лимита, значение равняется 0
+        if call_duration_add < 0:
+            call_duration_add = 0
+        if message_count_add < 0:
+            message_count_add = 0
+        if internet_add < 0:
+            internet_add = 0
+ 
+        # общий доход от тарифа "Смарт"
+        total_income = call_duration_add + message_count_add + internet_add + tariffs.loc[0, 'rub_monthly_fee']
+ 
+    # рассчитаем доходность тарифа "Ультра"
+    elif tariff == 'ultra':
+        # стоимость звонков сверх тарифа
+        call_duration_add = (call_duration - tariffs.loc[1, 'minutes_included'])\
+        *tariffs.loc[0, 'rub_per_minute']
+ 
+        # стоимость смс сверх тарифа
+        message_count_add = (message_count - tariffs.loc[1, 'messages_included'])\
+        *tariffs.loc[0, 'rub_per_message']
+ 
+        # стоимость интернета сверх тарифа
+        internet_add = (internet_used - tariffs.loc[1, 'mb_per_month_included'])\
+        *tariffs.loc[0, 'rub_per_gb']/1024
+ 
+        # когда израсходованных услуг меньше лимита, значение равняется 0
+        if call_duration_add < 0:
+            call_duration_add = 0
+        if message_count_add < 0:
+            message_count_add = 0
+        if internet_add < 0:
+            internet_add = 0
+ 
+        # общий доход от тарифа "Ультра"
+        total_income = call_duration_add + message_count_add + internet_add + tariffs.loc[1, 'rub_monthly_fee']
+ 
+    return total_income.round(decimals=2)
+ 
+# применим функцию ко всем строкам сгруппированной по месяцам таблицы с использованием услуг связи 
+megaline_data['income'] = megaline_data.apply(megaline_income, axis=1)
