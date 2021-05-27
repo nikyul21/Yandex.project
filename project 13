@@ -1,0 +1,6 @@
+# цикл который удаляет все символы до пробела
+
+for object_name in data.object_name:
+    if " " in object_name:
+        row_num = data.loc[data['object_name']==object_name].index[0]
+        data.at[row_num, 'object_name'] = object_name[object_name.index(" "):]
