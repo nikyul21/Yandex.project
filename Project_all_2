@@ -1,0 +1,15 @@
+# создаем функцию для подсчета уникальных пользователей для каждого события
+
+def event_count(new_data, event):
+    new_event_data = new_data[new_data['event_name'] == event]
+    user_event = new_event_data.groupby('experiment_number').agg({'id_user': 'nunique'})
+    old_event_data = new_data.groupby('experiment_number').agg({'id_user': 'nunique'})
+    result = user_event / old_event_data
+    return {'Доля' : result, 'Количество пользователей' : user_event}
+    
+    
+    new_data_246 = new_data.query('experiment_number == 246')
+    
+    data_246 = event_count(new_data_246, 'MainScreenAppear')
+
+    print(data_246)
