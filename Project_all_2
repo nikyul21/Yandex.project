@@ -13,3 +13,45 @@ def event_count(new_data, event):
     data_246 = event_count(new_data_246, 'MainScreenAppear')
 
     print(data_246)
+    
+    
+    ex_group_246 = new_data.query('experiment_number == 246')
+ex_246 = new_data.groupby('event_name').agg({'id_user':'nunique'}).sort_values(by = 'id_user', ascending = False)
+ 
+trials_246 = ex_246.id_user[0]
+successes_246 = ex_246.id_user[4]
+ 
+ex_group_247 = new_data.query('experiment_number == 247')
+ex_247 = new_data.groupby('event_name').agg({'id_user':'nunique'}).sort_values(by = 'id_user', ascending = False)
+ 
+trials_247 = ex_247.id_user[0]
+successes_247 = ex_247.id_user[4]
+  
+alpha = .05 # критический уровень статистической значимости
+ 
+# Пропорция успехов во группах
+p246 = successes_246/trials_246
+p247 = successes_247/trials_247
+ 
+# Пропорция успехов в комбинированном датасете:
+p_combined = (successes_246 + successes_247)/(trials_246 + trials_247)
+ 
+# Разница конверсий/# разница пропорций в датасетах
+p_diff = p246 - p247
+ 
+# считаем статистику в ст.отклонениях стандартного нормального распределения
+z_value = p_diff / mth.sqrt(p_combined * (1 - p_combined) * (1/trials_246 + 1/trials_247))
+ 
+# задаем стандартное нормальное распределение (среднее 0, ст.отклонение 1)
+distr = st.norm(0, 1)
+ 
+p_value = (1 - distr.cdf(abs(z_value))) * 2
+ 
+print('p-значение:',p_value)
+ 
+if (p_value < alpha):
+    print("Отвергаем нулевую гипотезу: между долями есть значимая разница")
+else:
+    print("Не получилось отвергнуть нулевую гипотезу, нет оснований считать доли разными.")
+
+print(ex_246.id_user[1])
